@@ -1,0 +1,9 @@
+CREATE TABLE support_tasks (
+    id UUID PRIMARY KEY DEFAULT get_random_uuid(),
+    title VARCHAR(150) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'OPEN'
+     CHECK (status in ('OPEN', 'IN_PROGRESS', 'RESOLVED')),
+    USER_ID UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+)
