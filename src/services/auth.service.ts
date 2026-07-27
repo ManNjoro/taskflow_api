@@ -37,7 +37,7 @@ export async function loginUser(email: string, password: string): Promise<{acces
         throw new AppError(401, 'Invalid email or password')
     }
 
-    const isPasswordValid = await bcrypt.compare(normalizeEmail, user.password_hash)
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash)
 
     if(!isPasswordValid) {
         throw new AppError(401, 'Invalid email or password')
