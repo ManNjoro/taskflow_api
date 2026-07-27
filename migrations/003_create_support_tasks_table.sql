@@ -1,5 +1,5 @@
 CREATE TABLE support_tasks (
-    id UUID PRIMARY KEY DEFAULT get_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(150) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'OPEN'
      CHECK (status in ('OPEN', 'IN_PROGRESS', 'RESOLVED')),
