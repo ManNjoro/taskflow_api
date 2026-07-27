@@ -14,4 +14,6 @@ export function createApp() {
     app.use('/api', apiRouter)
     app.use(notFound)
     app.use(errorHandler)
+
+    return app
 }
