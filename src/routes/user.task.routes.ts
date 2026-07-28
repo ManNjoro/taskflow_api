@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { authenticate } from '../middlewares/auth.middleware.js';
-import { createUserTask, getUserTaskById, getUserTasks, updateUserTask } from '../services/user.task.service.js';
+import { createUserTask, deleteUserTask, getUserTaskById, getUserTasks, updateUserTask } from '../services/user.task.service.js';
 
 export const userTaskRouter = Router();
 userTaskRouter.use(authenticate)
@@ -52,6 +52,19 @@ userTaskRouter.patch('/:taskId', async (req, res, next) => {
         res.status(200).json({
             success: true,
             data: {task}
+        })
+    } catch (error) {
+        next(error)
+    }
+})
+
+userTaskRouter.delete('/:taskId', async(req, res, next) => {
+    try {
+        await deleteUserTask(req.params.taskId, req.user!.userId)
+
+        res.status(200).json({
+            success: true,
+            message: 'Task deleted successfully from DB'
         })
     } catch (error) {
         next(error)
