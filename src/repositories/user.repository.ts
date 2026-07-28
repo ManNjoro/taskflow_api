@@ -1,4 +1,5 @@
 import { pool } from "../lib/db.js";
+import { Task } from "../types/task.js";
 import { DBUserRow, DBUserWithPasswordRow, User } from "../types/user.js";
 
 export async function findUserByEmail(email: string): Promise<User | null>{
@@ -28,4 +29,17 @@ export async function findUserByEmailWithPassword(email: string): Promise<DBUser
         `, [email]
     )
     return result.rows[0] ?? null
+}
+
+export async function fetchTaskByUserId(userId: string): Promise<Task[]>{
+    const result = await pool.query<Task>(
+        `
+        SELECT id, title, status, user_id, created_at, updated_at
+        FROM support_tasks
+        WHERE user_id = $1
+        ORDER BY created_at DESC
+        `,
+        [userId]
+    )
+    return result.rows
 }
