@@ -1,4 +1,7 @@
-export type TaskStatus = 'IN_PROGRESS' | 'OPEN' | 'RESOLVED'
+export const TASK_STATUSES = ['IN_PROGRESS', 'OPEN', 'RESOLVED'] as const;
+export type TaskStatus = typeof TASK_STATUSES[number]; 
+
+// export type TaskStatus = 'IN_PROGRESS' | 'OPEN' | 'RESOLVED'
 export type Task = {
     id: string;
     title: string;

@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
+    "docker:postgres": "docker exec -it nodejs-capstone-project psql -U postgres -d nodejs-capstone",
     "migrate": "tsx src/scripts/migrate.ts"
   },
   "keywords": [],
