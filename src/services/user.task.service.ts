@@ -1,5 +1,5 @@
 import { AppError } from "../errors/AppError.js";
-import { fetchTaskByUserId, findTaskByIdAndUserId } from "../repositories/user.task.repository.js";
+import { fetchTaskByUserId, findTaskByIdAndUserId, updateTaskTitle } from "../repositories/user.task.repository.js";
 import { createTask } from "../repositories/user.task.repository.js";
 import { Task } from "../types/task.js";
 
@@ -38,4 +38,14 @@ export async function getUserTaskById(
   }
 
   return task
+}
+
+export async function updateUserTask(taskId: string, userId: string, title: string):Promise<Task> {
+    const validTitle =  validateTitle(title)
+    const task = await updateTaskTitle(taskId, userId, validTitle)
+
+    if(!task)
+        throw new AppError(404, 'Task not found');
+
+    return task
 }
