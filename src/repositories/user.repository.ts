@@ -1,45 +1,39 @@
 import { pool } from "../lib/db.js";
-import { Task } from "../types/task.js";
 import { DBUserRow, DBUserWithPasswordRow, User } from "../types/user.js";
 
-export async function findUserByEmail(email: string): Promise<User | null>{
-    const result = await pool.query<DBUserRow>(
-        'SELECT id, email, role, created_at FROM users WHERE email = $1', [email]
-    )
+export async function findUserByEmail(email: string): Promise<User | null> {
+  const result = await pool.query<DBUserRow>(
+    "SELECT id, email, role, created_at FROM users WHERE email = $1",
+    [email],
+  );
 
-    return result.rows[0] ?? null
+  return result.rows[0] ?? null;
 }
 
-export async function createUser(email: string, passwordHash: string): Promise<User> {
-    const result = await pool.query<DBUserRow>(
-        `
+export async function createUser(
+  email: string,
+  passwordHash: string,
+): Promise<User> {
+  const result = await pool.query<DBUserRow>(
+    `
         INSERT INTO users (email, password_hash)
         VALUES ($1, $2)
         RETURNING id, email, role, created_at
-        `, [email, passwordHash]
-    )
-
-    return result.rows[0];
-}
-
-export async function findUserByEmailWithPassword(email: string): Promise<DBUserWithPasswordRow | null> {
-    const result = await pool.query<DBUserWithPasswordRow>(
-        `SELECT id, email, role, password_hash, created_at
-        FROM users WHERE email = $1
-        `, [email]
-    )
-    return result.rows[0] ?? null
-}
-
-export async function fetchTaskByUserId(userId: string): Promise<Task[]>{
-    const result = await pool.query<Task>(
-        `
-        SELECT id, title, status, user_id, created_at, updated_at
-        FROM support_tasks
-        WHERE user_id = $1
-        ORDER BY created_at DESC
         `,
-        [userId]
-    )
-    return result.rows
+    [email, passwordHash],
+  );
+
+  return result.rows[0];
+}
+
+export async function findUserByEmailWithPassword(
+  email: string,
+): Promise<DBUserWithPasswordRow | null> {
+  const result = await pool.query<DBUserWithPasswordRow>(
+    `SELECT id, email, role, password_hash, created_at
+        FROM users WHERE email = $1
+        `,
+    [email],
+  );
+  return result.rows[0] ?? null;
 }
