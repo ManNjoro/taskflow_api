@@ -1,4 +1,5 @@
 import { AppError } from "../errors/AppError.js";
+import { clearBannersCache, getBannersFromCache, setBannerCache } from "../lib/bannerCache.js";
 import { uploadBannerImageToCloudinary } from "../lib/cloudinary.js";
 import { createAdminBanner, fetchAllAdminBannersFromDB } from "../repositories/admin.banner.repository.js";
 import { Banner } from "../types/banner.js";
@@ -24,10 +25,17 @@ export async function createAdminBannerService(
     }
 
     const banner = await createAdminBanner(secureUrl, publicId)
+
+    await clearBannersCache()
     return banner
 }
 
 export async function fetchAdminBanners(): Promise<Banner[]>{
+    const getCachedBanners = await getBannersFromCache()
+
+    if(getCachedBanners) return getCachedBanners
     const banners = await fetchAllAdminBannersFromDB()
+
+    await setBannerCache(banners)
     return banners
 }
