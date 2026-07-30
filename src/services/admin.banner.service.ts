@@ -1,7 +1,8 @@
 import { AppError } from "../errors/AppError.js";
 import { clearBannersCache, getBannersFromCache, setBannerCache } from "../lib/bannerCache.js";
 import { uploadBannerImageToCloudinary } from "../lib/cloudinary.js";
-import { createAdminBanner, fetchAllAdminBannersFromDB } from "../repositories/admin.banner.repository.js";
+import { addDeleteCloudinaryImageJob } from "../queues/deleteCloudinaryImage.queue.js";
+import { createAdminBanner, deleteAdminBannerById, fetchAllAdminBannersFromDB } from "../repositories/admin.banner.repository.js";
 import { Banner } from "../types/banner.js";
 
 export async function createAdminBannerService(
@@ -38,4 +39,17 @@ export async function fetchAdminBanners(): Promise<Banner[]>{
 
     await setBannerCache(banners)
     return banners
+}
+
+export async function deleteAdminBannerService(
+    bannerId: string
+): Promise<void>{
+    const publicId = await deleteAdminBannerById(bannerId)
+
+    if(!publicId){
+        throw new AppError(404, 'Banner not found')
+    }
+
+    await clearBannersCache()
+    await addDeleteCloudinaryImageJob(publicId)
 }

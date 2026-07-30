@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { requireAdmin } from "../middlewares/admin.middleware.js";
 import { uploadSingleBannerImage } from "../middlewares/banner.middleware.js";
-import { createAdminBannerService, fetchAdminBanners } from "../services/admin.banner.service.js";
+import { createAdminBannerService, deleteAdminBannerService, fetchAdminBanners } from "../services/admin.banner.service.js";
 
 
 export const adminBannerRouter = Router()
@@ -29,6 +29,19 @@ adminBannerRouter.get('/', async(_req, res, next) => {
         res.status(200).json({
             success: true,
             data: { banners }
+        })
+    } catch (error) {
+        next(error)
+    }
+})
+
+adminBannerRouter.delete('/:bannerId', async(req, res, next) => {
+    try {
+        await deleteAdminBannerService(req.params.bannerId)
+
+        res.status(200).json({
+            success: true,
+            message: 'banner deleted successfully'
         })
     } catch (error) {
         next(error)

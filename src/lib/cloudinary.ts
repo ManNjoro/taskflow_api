@@ -38,3 +38,20 @@ export async function uploadBannerImageToCloudinary(buffer: Buffer, options?: {f
         uploadStream.end(buffer)
     })
 }
+
+
+export async function deleteBannerImageFromCloudinary(
+    publicId: string
+): Promise<void>{
+    const cloudName = env.cloudinaryCloudName
+    const apiKey = env.cloudinaryApiKey
+    const apiSecret = env.cloudinaryApiSecret
+
+    cloudinary.config({
+        cloud_name: cloudName,
+        api_key: apiKey,
+        api_secret: apiSecret
+    })
+
+    return cloudinary.uploader.destroy(publicId)
+}
