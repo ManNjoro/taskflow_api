@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginUser, registerUser } from "../services/auth.service.js";
+import { loginUser, loginWithGoogle, registerUser, startGoogleLogin } from "../services/auth.service.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 
 export const authRouter = Router()
@@ -39,4 +39,24 @@ authRouter.get('/me', authenticate, (req, res) => {
             user: req.user
         }
     })
+})
+
+authRouter.get('/google', (_req, res) => {
+    const googleAuthUrl = startGoogleLogin()
+    res.redirect(googleAuthUrl)
+})
+
+authRouter.get('/google/callback', async(req, res, next) => {
+    try {
+        const code = req.query.code as string | undefined
+
+        const {accessToken} = await loginWithGoogle(code ?? '')
+
+        res.status(200).json({
+            success: true,
+            data: {accessToken}
+        })
+    } catch (error) {
+        next(error)
+    }
 })

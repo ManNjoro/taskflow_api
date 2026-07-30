@@ -1,7 +1,9 @@
 import bcrypt from "bcryptjs";
 import { AppError } from "../errors/AppError.js";
-import { createUser, findUserByEmail, findUserByEmailWithPassword } from "../repositories/user.repository.js";
+import { createGoogleUser, createUser, findUserByEmail, findUserByEmailWithPassword, findUserByGoogleId, linkGoogleIdToUser } from "../repositories/user.repository.js";
 import { signAccessToken } from "../lib/jwt.js";
+import { getGoogleAuthUrl, getGoogleUserFromAuthCode } from "../lib/google.js";
+import { User } from "../types/user.js";
 
 export async function registerUser(email: string, password: string): Promise<void>{
     if(!email || !password) {
@@ -48,6 +50,37 @@ export async function loginUser(email: string, password: string): Promise<{acces
         role: user.role,
         userId: user.id
     })
+
+    return {accessToken}
+}
+
+export function startGoogleLogin(): string{
+    return getGoogleAuthUrl()
+}
+
+function createAccessTokenForUser(user: User): string {
+    return signAccessToken({
+        userId: user.id,
+        email: user.email,
+        role: user.role
+    })
+}
+
+export async function loginWithGoogle(code: string): Promise<{accessToken: string}> {
+    const googleProfile = await getGoogleUserFromAuthCode(code)
+    let user = await findUserByGoogleId(googleProfile.googleId)
+
+    if(!user){
+        user = await findUserByEmail(googleProfile.email)
+
+        if(user) {
+            user = await linkGoogleIdToUser(user.id, googleProfile.googleId)
+        } else {
+            user = await createGoogleUser(googleProfile.email, googleProfile.googleId)
+        }
+    }
+
+    const accessToken = createAccessTokenForUser(user)
 
     return {accessToken}
 }
